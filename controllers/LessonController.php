@@ -13,6 +13,7 @@ use app\models\Lesson;
 use yii\behaviors\TimestampBehavior;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -166,7 +167,12 @@ class LessonController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if($model->creator_id != Yii::$app->user->id){
+            throw new ForbiddenHttpException();
+        }
+        $model->delete();
 
         return $this->redirect(['index']);
     }
